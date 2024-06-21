@@ -1,0 +1,14 @@
+int i = 0;
+while(int i < 50){ //As long it's not reach number 50, it will continue looping
+    for(int j = 0; j < 25; j++){ //It will find match number in text with i
+        String expectNum = String.format("//*[@id="grid"]/div[%s]/span",j);
+        WebElement selection = By.xpath(expectNum).findElement(driver);
+        String realNum = selection.getText();
+
+        if (realNum == i){ //If match between "I" and text in elements, click
+            selection.click();
+            i++;
+            Continue;
+        }
+    }
+}
