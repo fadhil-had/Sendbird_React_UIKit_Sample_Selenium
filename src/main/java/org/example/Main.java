@@ -18,7 +18,7 @@ import java.util.List;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     @Test
-    public void login() throws InterruptedException, IOException, UnsupportedFlavorException {
+    public void register() throws InterruptedException, IOException, UnsupportedFlavorException {
         WebDriver driver = new ChromeDriver();
         JavascriptExecutor js = (JavascriptExecutor) driver;
         Actions dragger = new Actions(driver);
@@ -29,18 +29,37 @@ public class Main {
         //Open Builder url
         driver.get("https://sendbird-uikit-react.netlify.app/url-builder");
 
+        registerUser(driver, appIdStr, 1);
+
+        gotoTab(driver, 0); // zero based
+
+        registerUser(driver, appIdStr, 2);
+
+        Thread.sleep(5000);
+
+        driver.quit();
+    }
+
+    public static String generateRandomUserId() {
+        return "test_"+ (RandomStringUtils.randomAlphabetic(3))+"_"+(RandomStringUtils.randomNumeric(1));
+    }
+
+    public void registerUser(WebDriver driver, String appIdStr, int num) throws InterruptedException, IOException, UnsupportedFlavorException {
         //Input appId
         WebElement appId = By.xpath("//input[@name='appId']").findElement(driver);
+        appId.clear();
         appId.sendKeys(appIdStr);
 
         //Input userId1
         WebElement userId = By.xpath("//input[@name='userId']").findElement(driver);
         String userId1 = generateRandomUserId();
+        userId.clear();
         userId.sendKeys(userId1);
 
         //Input nickname1
         WebElement nickname = By.xpath("//input[@name='nickname']").findElement(driver);
         String nickname1 = userId1.substring(5,10);
+        nickname.clear();
         nickname.sendKeys(nickname1);
 
         WebElement copy = By.xpath("//button[@class='sticky-bottom-button']").findElement(driver);
@@ -50,41 +69,8 @@ public class Main {
 
         // Open new tab for userId1
         openNewTab(driver);
-        gotoTab(driver, 1); // zero based
+        gotoTab(driver, num); // zero based
         driver.get(c.getData(DataFlavor.stringFlavor).toString());
-
-        gotoTab(driver, 0); // zero based
-
-        //Input appId
-        appId.clear();
-        appId.sendKeys(appIdStr);
-
-        //Input userId1
-        String userId2 = generateRandomUserId();
-        userId.clear();
-        userId.sendKeys(userId2);
-
-        //Input nickname1
-        String nickname2 = userId2.substring(5,10);
-        nickname.clear();
-        nickname.sendKeys(nickname2);
-
-        copy.click();
-
-        c = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-        // Open new tab for userId1
-        openNewTab(driver);
-        gotoTab(driver, 2); // zero based
-        driver.get(c.getData(DataFlavor.stringFlavor).toString());
-
-        Thread.sleep(5000);
-
-        driver.quit();
-    }
-
-    public static String generateRandomUserId() {
-        return "test_"+ (RandomStringUtils.randomAlphabetic(3))+"_"+(RandomStringUtils.randomNumeric(1));
     }
 
     public void openNewTab(WebDriver driver) throws InterruptedException {
