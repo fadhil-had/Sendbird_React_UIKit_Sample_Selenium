@@ -1,12 +1,20 @@
 # Sendbird React UIKit Sample Application Walkthrough with Automation Testing and CI Integration
 Task for automation testing using Selenium Java and CI Integration
 
-## In order to use the framework:
+## To use the framework:
 
-1. Fork the repository.
+1. Fork this repository.
 2. Clone, i.e, download your copy of the repository to your local machine using
-[git clone https://github.com/[your_username]/selenium-java-test-automation-architecture.git]
+```
+git clone https://github.com/[your_username]/selenium-java-test-automation-architecture.git
+```
 3. Import the project in IntelliJ IDEA.
-4. Make your desired changes.
-5. Use IntelliJ IDEA to run your desired tests. Alternatively, you can use the terminal to run the tests, for example ./gradlew test -Dbrowser=firefox -Dheadless=false to run all the tests using the firefox browser in headful mode.
-6. To see the report, go to the testoutput folder in the project root and then go to the report folder.
+4. Make your changes.
+5. Run the test.
+
+## The project uses the following:
+
+- *[Java 21]([https://openjdk.java.net/projects/jdk/11/](https://openjdk.org/projects/jdk/21/))* as the programming language.
+- *[Selenium WebDriver](https://www.selenium.dev/)* as the web browser automation framework using the Java binding.
+- *[TestNG](https://testng.org/doc/)* as the testing framework.
+- *[IntelliJ IDEA](https://www.jetbrains.com/idea/)* as the IDE.
