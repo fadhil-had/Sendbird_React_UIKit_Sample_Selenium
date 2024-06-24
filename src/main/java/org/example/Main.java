@@ -9,6 +9,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import javax.imageio.ImageIO;
@@ -55,7 +56,9 @@ public class Main {
         String message2 = sendMessage(driver,uploadFile2);
 
         Thread.sleep(500);
-        //verifyMessage(driver,2,userData1.getLast());
+        verifyMessage(driver,2,userData1.getLast(), null, message0);
+        verifyMessage(driver,2,userData1.getLast(), uploadFile, message1);
+        verifyMessage(driver,2,userData1.getLast(), uploadFile2, message2);
 
         //driver.quit();
     }
@@ -82,17 +85,23 @@ public class Main {
         createChat.click();
     }
 
-    public void verifyMessage(WebDriver driver, int num, String userId, File uploadFile) throws InterruptedException, IOException, UnsupportedFlavorException {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    public void verifyMessage(WebDriver driver, int num, String userId, File uploadFile, String message) throws InterruptedException, IOException, UnsupportedFlavorException {
+        String src;
         gotoTab(driver, num);
 
         WebElement newChat = driver.findElement(By.xpath(String.format("//span[text()='%s']",userId)));
         newChat.click();
 
         if (uploadFile != null) {
-            //driver.findElement(By.xpath())
+            if (isImage(uploadFile)){
+                WebElement file = driver.findElement(By.xpath("//img[@class='sendbird-image-renderer__hidden-image-loader']"));
+                src = file.getAttribute("src").split("\\?")[0];
+            } else {
+                src = uploadFile.getName();
+            }
+            Assert.assertEquals(src,message,"Message not sent!");
         } else {
-            if (driver.findElements(By.xpath("//span[text()='Hay']")).isEmpty()){
+            if (driver.findElements(By.xpath(String.format("//span[text()='%s']",message))).isEmpty()){
                 System.out.println("Element not visible, message not sent!");
             }
         }
