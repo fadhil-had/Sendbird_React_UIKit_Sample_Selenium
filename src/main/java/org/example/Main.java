@@ -39,28 +39,33 @@ public class Main {
         //Open Builder url
         driver.get("https://sendbird-uikit-react.netlify.app/url-builder");
 
+        //Register user1 and save data
         ArrayList<String> userData1 = registerUser(driver, appIdStr, 1);
 
         gotoTab(driver, 0); // zero based
 
+        //Register user2
         ArrayList<String> userData2 = registerUser(driver, appIdStr, 2);
 
         gotoTab(driver, 0);
 
         Thread.sleep(5000);
 
+        //Create group chat
         createMessage(driver,1, userData2.getFirst());
 
+        //Send message to user2
         String message0 = sendMessage(driver,null);
         String message1 = sendMessage(driver,uploadFile);
         String message2 = sendMessage(driver,uploadFile2);
 
         Thread.sleep(500);
+        //Verify message in user2
         verifyMessage(driver,2,userData1.getLast(), null, message0);
         verifyMessage(driver,2,userData1.getLast(), uploadFile, message1);
         verifyMessage(driver,2,userData1.getLast(), uploadFile2, message2);
 
-        //driver.quit();
+        driver.quit();
     }
 
     public void createMessage(WebDriver driver, int num, String userId) throws InterruptedException, IOException, UnsupportedFlavorException {
