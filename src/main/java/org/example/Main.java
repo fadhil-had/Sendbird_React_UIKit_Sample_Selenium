@@ -30,6 +30,7 @@ public class Main {
         String appIdStr = "37C8DB25-8B44-435F-A528-5BA9B9965FD0";
 
         File uploadFile = new File("src/main/resources/file1.jpeg");
+        File uploadFile2 = new File("src/main/resources/file2.txt");
 
         driver.manage().window().maximize();
         //Open Builder url
@@ -41,9 +42,18 @@ public class Main {
 
         ArrayList<String> userData2 = registerUser(driver, appIdStr, 2);
 
+        gotoTab(driver, 0);
+
         Thread.sleep(5000);
 
-        createMessage(driver,2, userData1.getFirst());
+        createMessage(driver,1, userData2.getFirst());
+
+        sendMessage(driver,null);
+        sendMessage(driver,uploadFile);
+        sendMessage(driver,uploadFile2);
+
+        Thread.sleep(500);
+        verifyMessage(driver,2,userData1.getLast());
 
         //driver.quit();
     }
@@ -70,21 +80,31 @@ public class Main {
         createChat.click();
     }
 
-    public void sendMessage(WebDriver driver, File uploadFile){
+    public void verifyMessage(WebDriver driver, int num, String userId) throws InterruptedException, IOException, UnsupportedFlavorException {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        gotoTab(driver, num);
+
+        //WebElement newChat = driver.findElement(By.xpath("//div[@class='sendbird-channel-preview__content__upper__header__channel-name sendbird-label sendbird-label--subtitle-2 sendbird-label--color-onbackground-1']"));
+        WebElement newChat = driver.findElement(By.xpath(String.format("//span[[text()='%s']",userId)));
+        newChat.click();
+
+        WebElement newGroup = driver.findElement(By.xpath("//div[@class='sendbird-add-channel__rectangle']"));
+        newGroup.click();
+    }
+
+    public void sendMessage(WebDriver driver, File uploadFile) throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        Thread.sleep(5000);
 
         if (uploadFile != null){
-            WebElement test = driver.findElement(By.xpath("//div[contains(@class,'sendbird-icon sendbird-icon-attach sendbird-icon-color--content-inverse')]"));
-            test.click();
-
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@class=\"sendbird-message-input--attach-input\"]")));
-
             WebElement filepath = driver.findElement(By.cssSelector("input[type=file]"));
             filepath.sendKeys(uploadFile.getAbsolutePath());
         } else {
-            WebElement test = driver.findElement(By.xpath("//div[@id='sendbird-message-input-text-field']"));
-            test.sendKeys("Hay");
+            WebElement test2 = driver.findElement(By.xpath("//div[@id='sendbird-message-input-text-field']"));
+            test2.sendKeys("Hay");
 
+            WebElement test = driver.findElement(By.xpath("//button[@data-testid='sendbird-message-input-send-button']"));
+            test.click();
         }
     }
 
