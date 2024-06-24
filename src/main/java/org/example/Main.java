@@ -7,9 +7,11 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.interactions.Actions;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -48,12 +50,12 @@ public class Main {
 
         createMessage(driver,1, userData2.getFirst());
 
-        sendMessage(driver,null);
-        sendMessage(driver,uploadFile);
-        sendMessage(driver,uploadFile2);
+        String message0 = sendMessage(driver,null);
+        String message1 = sendMessage(driver,uploadFile);
+        String message2 = sendMessage(driver,uploadFile2);
 
         Thread.sleep(500);
-        verifyMessage(driver,2,userData1.getLast());
+        //verifyMessage(driver,2,userData1.getLast());
 
         //driver.quit();
     }
@@ -80,32 +82,46 @@ public class Main {
         createChat.click();
     }
 
-    public void verifyMessage(WebDriver driver, int num, String userId) throws InterruptedException, IOException, UnsupportedFlavorException {
+    public void verifyMessage(WebDriver driver, int num, String userId, File uploadFile) throws InterruptedException, IOException, UnsupportedFlavorException {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         gotoTab(driver, num);
 
-        //WebElement newChat = driver.findElement(By.xpath("//div[@class='sendbird-channel-preview__content__upper__header__channel-name sendbird-label sendbird-label--subtitle-2 sendbird-label--color-onbackground-1']"));
-        WebElement newChat = driver.findElement(By.xpath(String.format("//span[[text()='%s']",userId)));
+        WebElement newChat = driver.findElement(By.xpath(String.format("//span[text()='%s']",userId)));
         newChat.click();
 
-        WebElement newGroup = driver.findElement(By.xpath("//div[@class='sendbird-add-channel__rectangle']"));
-        newGroup.click();
+        if (uploadFile != null) {
+            //driver.findElement(By.xpath())
+        } else {
+            if (driver.findElements(By.xpath("//span[text()='Hay']")).isEmpty()){
+                System.out.println("Element not visible, message not sent!");
+            }
+        }
     }
 
-    public void sendMessage(WebDriver driver, File uploadFile) throws InterruptedException {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    public String sendMessage(WebDriver driver, File uploadFile) throws InterruptedException {
         Thread.sleep(5000);
+        String src;
 
         if (uploadFile != null){
             WebElement filepath = driver.findElement(By.cssSelector("input[type=file]"));
             filepath.sendKeys(uploadFile.getAbsolutePath());
+            Thread.sleep(10000);
+
+            if (isImage(uploadFile)){
+                WebElement file = driver.findElement(By.xpath("//img[@class='sendbird-image-renderer__hidden-image-loader']"));
+                src = file.getAttribute("src").split("\\?")[0];
+            } else {
+                src = uploadFile.getName();
+            }
         } else {
             WebElement test2 = driver.findElement(By.xpath("//div[@id='sendbird-message-input-text-field']"));
-            test2.sendKeys("Hay");
+            src = "Hay";
+            test2.sendKeys(src);
 
             WebElement test = driver.findElement(By.xpath("//button[@data-testid='sendbird-message-input-send-button']"));
             test.click();
         }
+        return src;
     }
 
     public static String generateRandomUserId() {
@@ -157,5 +173,14 @@ public class Main {
         List<String> winHandles = new ArrayList<>(driver.getWindowHandles());
         Thread.sleep(500);
         driver.switchTo().window(winHandles.get(tabIndex));
+    }
+
+    public static boolean isImage(File file)
+    {
+        try {
+            return ImageIO.read(file) != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
