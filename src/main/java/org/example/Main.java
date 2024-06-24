@@ -7,7 +7,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.interactions.Actions;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -27,8 +26,6 @@ public class Main {
     @Test
     public void register() throws InterruptedException, IOException, UnsupportedFlavorException {
         WebDriver driver = new ChromeDriver();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        Actions dragger = new Actions(driver);
 
         String appIdStr = "37C8DB25-8B44-435F-A528-5BA9B9965FD0";
 
@@ -139,7 +136,7 @@ public class Main {
     }
 
     public static String generateRandomUserId() {
-        return "test_"+ (RandomStringUtils.randomAlphabetic(3))+"_"+(RandomStringUtils.randomNumeric(1));
+        return "test_"+ (RandomStringUtils.randomAlphabetic(5))+"_"+(RandomStringUtils.randomNumeric(2));
     }
 
     public ArrayList<String> registerUser(WebDriver driver, String appIdStr, int num) throws InterruptedException, IOException, UnsupportedFlavorException {
@@ -156,7 +153,7 @@ public class Main {
 
         //Input nickname1
         WebElement nickname = By.xpath("//input[@name='nickname']").findElement(driver);
-        String nickname1 = userId1.substring(5,10);
+        String nickname1 = userId1.substring(5,13);
         nickname.clear();
         nickname.sendKeys(nickname1);
 
