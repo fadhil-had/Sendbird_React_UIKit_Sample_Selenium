@@ -6,9 +6,13 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.interactions.Actions;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import java.awt.datatransfer.*;
 import java.awt.*;
@@ -25,26 +29,70 @@ public class Main {
 
         String appIdStr = "37C8DB25-8B44-435F-A528-5BA9B9965FD0";
 
+        File uploadFile = new File("src/main/resources/file1.jpeg");
+
         driver.manage().window().maximize();
         //Open Builder url
         driver.get("https://sendbird-uikit-react.netlify.app/url-builder");
 
-        registerUser(driver, appIdStr, 1);
+        ArrayList<String> userData1 = registerUser(driver, appIdStr, 1);
 
         gotoTab(driver, 0); // zero based
 
-        registerUser(driver, appIdStr, 2);
+        ArrayList<String> userData2 = registerUser(driver, appIdStr, 2);
 
         Thread.sleep(5000);
 
-        driver.quit();
+        createMessage(driver,2, userData1.getFirst());
+
+        //driver.quit();
+    }
+
+    public void createMessage(WebDriver driver, int num, String userId) throws InterruptedException, IOException, UnsupportedFlavorException {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        gotoTab(driver, num);
+
+        WebElement newChat = driver.findElement(By.xpath("//div[@class=' sendbird-icon sendbird-icon-create sendbird-icon-color--primary']//*[name()='svg']"));
+        newChat.click();
+
+        WebElement newGroup = driver.findElement(By.xpath("//div[@class='sendbird-add-channel__rectangle']"));
+        newGroup.click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format("//label[contains(@for,'%s')]//span[contains(@class,'sendbird-checkbox--checkmark')]",userId))));
+
+        WebElement userChat = driver.findElement(By.xpath(String.format("//label[contains(@for,'%s')]//span[contains(@class,'sendbird-checkbox--checkmark')]",userId)));
+        // Javascript executor
+        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView(true);", userChat);
+        Thread.sleep(800);
+        userChat.click();
+
+        WebElement createChat = driver.findElement(By.xpath("//button[contains(@class,'sendbird-button--primary sendbird-button--big')]"));
+        createChat.click();
+    }
+
+    public void sendMessage(WebDriver driver, File uploadFile){
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        if (uploadFile != null){
+            WebElement test = driver.findElement(By.xpath("//div[contains(@class,'sendbird-icon sendbird-icon-attach sendbird-icon-color--content-inverse')]"));
+            test.click();
+
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@class=\"sendbird-message-input--attach-input\"]")));
+
+            WebElement filepath = driver.findElement(By.cssSelector("input[type=file]"));
+            filepath.sendKeys(uploadFile.getAbsolutePath());
+        } else {
+            WebElement test = driver.findElement(By.xpath("//div[@id='sendbird-message-input-text-field']"));
+            test.sendKeys("Hay");
+
+        }
     }
 
     public static String generateRandomUserId() {
         return "test_"+ (RandomStringUtils.randomAlphabetic(3))+"_"+(RandomStringUtils.randomNumeric(1));
     }
 
-    public void registerUser(WebDriver driver, String appIdStr, int num) throws InterruptedException, IOException, UnsupportedFlavorException {
+    public ArrayList<String> registerUser(WebDriver driver, String appIdStr, int num) throws InterruptedException, IOException, UnsupportedFlavorException {
         //Input appId
         WebElement appId = By.xpath("//input[@name='appId']").findElement(driver);
         appId.clear();
@@ -71,6 +119,12 @@ public class Main {
         openNewTab(driver);
         gotoTab(driver, num); // zero based
         driver.get(c.getData(DataFlavor.stringFlavor).toString());
+
+        ArrayList<String> userData = new ArrayList<String>();
+        userData.add(userId1);
+        userData.add(nickname1);
+
+        return userData;
     }
 
     public void openNewTab(WebDriver driver) throws InterruptedException {
